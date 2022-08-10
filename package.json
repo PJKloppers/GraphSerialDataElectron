@@ -1,0 +1,16 @@
+{
+  "name": "graphserialdata",
+  "version": "1.0.0",
+  "description": "get input from serial device and display it",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap5": "^1.1.9",
+    "electron": "^20.0.1",
+    "serialport": "^10.4.0"
+  }
+}
