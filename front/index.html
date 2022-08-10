@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph USB Serial Port</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap5/src/css/bootstrap.min.css">
+    <script src="../node_modules/bootstrap5/src/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div class="container-fluid p-2 ">
+    <div class="dropdown w-100">
+        <a class="btn btn-secondary dropdown-toggle" id="selected" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+          Select Serial Port
+        </a>
+        <ul class="dropdown-menu" id="ports" aria-labelledby="dropdownMenuLink">
+          
+        </ul>
+        
+        <button class="btn btn-secondary"  onclick="closeport()" id="closebtn">Close Conection</button>
+
+
+      </div>
+</div>
+
+
+    
+</body>
+</html>
+
+<script>
+    const {ipcRenderer} = require('electron');
+    
+    //add serialport module 
+    const SerialPort = require('serialport');
+
+   var PORT =  null;
+
+    //get element #ports
+    const ports = document.getElementById('ports');
+    //get element #selected
+    const selected = document.getElementById('selected');
+
+   
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        ipcRenderer.send('ready',null);
+    });
+    ipcRenderer.on('ports', (event, lst) => {
+        lst.forEach(port => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.className = 'dropdown-item';
+            a.href = '#';
+            a.innerText = port;
+            a.addEventListener('click', function () {
+                selected.innerText = port;
+                port_selected(port);
+            } );
+            li.appendChild(a);
+            ports.appendChild(li);
+        } );
+    } );
+
+function port_selected(portname){
+    PORT = new SerialPort.SerialPort(portname, {
+        baudRate: 115200,
+        dataBits: 8,
+        parity: 'none',
+        stopBits: 1,
+        flowControl: false,
+        autoOpen: false
+    });
+    PORT.open(function (err) {
+        if (err) {
+            alert('Error opening port: ', err.message);
+            console.error();
+        }
+        alert('Port open');
+        document.getElementById('closebtn').hidden = false;
+    });
+    //read from port
+    PORT.on('data', function (data) {
+        console.log('Data:', data);
+    } );
+
+
+}
+function closeport(){
+    PORT.close(function (err) {
+        if (err) {
+             Alert('Error closing port: ', err.message);
+        }
+        Alert('Port closed');
+    });
+}
+
+</script>
